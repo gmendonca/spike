@@ -30,13 +30,13 @@ public class Client extends Thread {
 			// put option
 			dOut.writeByte(0);
 			dOut.flush();
-
+	
 			// key, value
 			dOut.writeUTF(key);
 			dOut.flush();
 			dOut.writeUTF(value);
 			dOut.flush();
-
+	
 			DataInputStream dIn = new DataInputStream(socket.getInputStream());
 			ack = dIn.readBoolean();
 		}
@@ -50,19 +50,19 @@ public class Client extends Thread {
 			return null;
 
 		Socket socket = socketList.get(pId);
-
+		
 		String value;
 		synchronized(socket){
 			DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
-
+	
 			// get option
 			dOut.writeByte(1);
 			dOut.flush();
-
+	
 			// key
 			dOut.writeUTF(key);
 			dOut.flush();
-
+	
 			DataInputStream dIn = new DataInputStream(socket.getInputStream());
 			value = dIn.readUTF();
 		}
@@ -79,15 +79,15 @@ public class Client extends Thread {
 		boolean ack;
 		synchronized(socket){
 			DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
-
+	
 			// put option
 			dOut.writeByte(2);
 			dOut.flush();
-
+	
 			// key
 			dOut.writeUTF(key);
 			dOut.flush();
-
+	
 			DataInputStream dIn = new DataInputStream(socket.getInputStream());
 			ack = dIn.readBoolean();
 		}
@@ -96,36 +96,36 @@ public class Client extends Thread {
 	}
 
 	public static void main(String[] args) throws IOException {
-
+		
 		ArrayList<String> peerList = DistributedHashtable.readConfigFile();
 		int numPeers = peerList.size();
-
+		
 		if(args.length < 1){
 			System.out.println("Usage: java -jar build/RemoteClient.jar <Number of Operations>");
 			return;
 		}
-
+		
 		String[] peerAddress;
 		String address;
 		int port;
-
-
+		
+		
 		int num = 0;
-
+		
 		for(int i = 0; i < peerList.size(); i++){
 			peerAddress = peerList.get(i).split(":");
 			if(Inet4Address.getLocalHost().getHostAddress().equals(peerAddress[0]))
 				num = i;
 		}
-
+		
 		int operations = Integer.parseInt(args[0]);
 		if(operations < 0){
 			System.out.println("Number of operations should be a positive number!");
 			return;
 		}
-
+		
 		ArrayList<Socket> socketList = new ArrayList<Socket>();
-
+		
 		System.out.println("Running as Client " + num);
 
 		int id;
@@ -134,14 +134,14 @@ public class Client extends Thread {
 			peerAddress = peerList.get(id).split(":");
 			address =  peerAddress[0];
 			port = Integer.parseInt(peerAddress[1]);
-
+			
 			try {
-				//System.out.println("Testing connection to server " + address + ":"
-				//		+ port);
+				System.out.println("Testing connection to server " + address + ":"
+						+ port);
 				Socket s = new Socket(address, port);
 				socketList.add(s);
-				//System.out.println("Server " + address + ":"
-				//		+ port + " is running.");
+				System.out.println("Server " + address + ":"
+						+ port + " is running.");
 			} catch (Exception e) {
 				// System.out.println("Not connected to server " + address + ":"
 				// + port);
@@ -150,9 +150,9 @@ public class Client extends Thread {
 				port--;
 			}
 		}
-
+		
 		Client.socketList = socketList;
-
+		
 		long start, stop, time;
 		int pId;
 		String key;
